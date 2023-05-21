@@ -1,0 +1,89 @@
+body{
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100vh;
+    background: #0c243b;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+nav{
+    background: #fff;
+}
+
+main{
+    width: 75%;
+    margin:  auto;
+    margin-top: 10vh;
+}
+
+.container3{
+    background: #fff;
+    border-radius: 3px;
+    border: solid 1px;
+}
+.container4{
+    color: #000;
+    padding-left: 30px;
+}
+
+form{
+    padding: 5px;
+}
+
+form input{
+    height: 45px;
+    width: 100%;
+    padding: 5px 15px;
+    font-family: 'Times New Roman', Times, serif;
+    border-radius: 1px;
+    border: none;
+}
+
+select {
+    width: 100%;
+    padding: 5px 15px;
+    color: gray;
+    height: 45px;
+    border: none;
+    border-radius: 3px;
+}
+
+
+.bttn {
+    padding-left: 10px;
+}
+
+.spn {
+    color: #0c243b;
+    padding-top: 5px;
+}
+
+button, .a-btn{
+    min-width: 165px;
+    width: auto;
+    height: 50px;
+    letter-spacing: 0.5px;
+    line-height: 50px;
+    padding: 0 35px 0 35px;
+    font-size: 15px;
+    background-color: #0c243b;
+    color: white;
+    text-transform: uppercase;
+    font-family: 'Open Sans Condensed';
+    font-weight: bolder;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+}
+
+.a-btn{
+    padding: 10px 20px;
+    text-decoration: none;
+}
+
+button:hover, .a-btn:hover {
+    background-color: white;
+    color: #0c243b;
+    border: 1px solid #0c243b;
+}
