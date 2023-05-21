@@ -3,8 +3,6 @@ const Donor = require("../models/Donor");
 const request = require('request');
 const {initializePayment, verifyPayment} = require('../config/paystack')(request);
 
-// Assuming you have the required dependencies and configurations already set up
-
 router.post('/paystack/pay', (req, res) => {
   const { fullname, regno, phone, course } = req.body;
   
@@ -107,71 +105,17 @@ router.get('/receipt/:id', (req, res)=>{
     const id = req.params.id;
     Donor.findById(id).then((donor)=>{
         if(!donor){
-            res.redirect('/error')
+            // res.redirect('/error')
+          return res.status(401).send({error: "Error"})
         }
-        res.render('success.pug',{donor});
+      //res.render('success.pug', { donor });
+      return res.status(200).send({success: donor})
     }).catch((e)=>{
-        res.redirect('/error')
+        // res.redirect('/error')
+      return res.status(500).send({error: "Error"})
     })
 })
 
-router.post('/add', (req,res)=>{
-
-})
-
-router.get('/error', (req, res)=>{
-    res.render('error.pug');
-})
-
-
-
-router.post('/login', (req,res)=>{
-
-  const user = new User({
-  username: req.body.username,
-  password: req.body.password,
-});
-req.login(user, (err) => {
-  if (err) {
-    console.log(err);
-  } else {
-    passport.authenticate("local")(req, res, () => {
-      res.status(200).json({ success: "Login Successfully" });
-    });
-  }
-});
-})
-
-router.get('/logout',  (req,res)=>{
-     req.logout(function (err) {
-   if (err) {
-     return next(err);
-   }
-   res.redirect("/");
- });
-})
-
-router.get("/authenticate", (req, res) => {
-  if (req.isAuthenticated()) {
-    // res.status(200).json({
-    // authenticated: true
-    // });
-    res.json(req.user);
-    console.log("Authenticated");
-  } else {
-    console.log("Not Authenticated");
-  }
-});
-
-router.get("/findUser", (req, res) => {
-  User.find({}, (err, user) => {
-    if (!err) {
-      return res.send(user);
-    } else {
-      console.log(err);
-    }
-  });
-});
 
 
 module.exports = router;
