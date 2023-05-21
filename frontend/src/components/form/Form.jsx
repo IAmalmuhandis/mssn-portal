@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Button, Grid, Paper, TextField, Typography } from "@mui/material";
+import { Box, Button, Grid, Paper, TextField, Typography, Select, MenuItem, InputLabel } from "@mui/material";
 
 const Form = () => {
   const [name, setName] = useState("");
@@ -79,12 +79,20 @@ const Form = () => {
           />
         </Grid>
         <Grid item xs={12} sm={12} md={5.78}>
-          <TextField
-            required
-            label="Level"
-            onChange={(e) => setLevel(e.target.value)}
-            sx={{ width: "100%" }}
-          />
+        <InputLabel id="level-label">Level</InputLabel>
+           <Select
+        labelId="level-label"
+        value={level}
+        onChange={(e) => setLevel(e.target.value)}
+        sx={{ width: "60%"}}
+      
+      >
+        <MenuItem value="100">Level 100</MenuItem>
+        <MenuItem value="200">Level 200</MenuItem>
+        <MenuItem value="300">Level 300</MenuItem>
+        <MenuItem value="400">Level 400</MenuItem>
+      </Select>
+         
         </Grid>
         <Grid item xs={12} sm={12} md={5.78}>
           <TextField

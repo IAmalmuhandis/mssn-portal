@@ -66,7 +66,7 @@ const Reciept = () => {
           <div className="details" style={{ width: '70%' }}>
             <div className="info name">
               <p className="key">Name:</p>
-              <p className="value">Musaiyib Yakubu Usman</p>
+              <p className="value">Abubakar Muhammad Umar</p>
             </div>
             <div className="info regNo">
               <p className="key">Registration Number:</p>
@@ -74,7 +74,7 @@ const Reciept = () => {
             </div>
             <div className="info department">
               <p className="key">Department:</p>
-              <p className="value">Computer Science</p>
+              <p className="value">Software Engineering</p>
             </div>
             <div className="info level">
               <p className="key">Level:</p>
