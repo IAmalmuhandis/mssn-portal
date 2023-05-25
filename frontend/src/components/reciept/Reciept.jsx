@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 import QRCode from 'qrcode'
 import html2pdf from "html2pdf.js";
 import { useReactToPrint } from 'react-to-print';
-
-import Navbar from "../navbar/Navbar";
 import aukLogo from "./../../assets/auk-logo.png";
 import mssnLogo from "./../../assets/mssn-auk.png";
 
@@ -14,6 +13,7 @@ import './Reciept.css'
 
 const Reciept = () => {
   const [qrCode, setQrCode] = useState('')
+  const [studentInfo, setStudentInfo] = useState(null);
   const contentRef = useRef();
   const location = useLocation();
   const navigate = useNavigate();
@@ -28,11 +28,22 @@ const Reciept = () => {
       console.error(err);
     }
   };
+
+  const fetchStudentInfo = async (registrationNumber) => {
+    try {
+      const response = await axios.get(`/api/students/${registrationNumber}`);
+      setStudentInfo(response.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
-    generateQR("018/019/019/019/019");
+    const registrationNumber = "018/019/019/019/019";
+    generateQR(registrationNumber);
+    fetchStudentInfo(registrationNumber);
   }, []);
-    
-  
+
   const downloadPdf = () => {
     const content = contentRef.current;
 
@@ -61,7 +72,7 @@ const Reciept = () => {
 
   return (
     <div className="reciept">
-      <Navbar />
+
       <Box width='100%' sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', paddingTop: 20 }}>
         <Paper elevation={4} sx={{width: 595}}>
           <Box ref={contentRef} width='100%' sx={{ mt: 5, alignItems: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', position: 'relative' }}>
@@ -72,33 +83,33 @@ const Reciept = () => {
               <img style={{position: 'absolute', width: 100, right: 25, top: -10}}  src={mssnLogo} alt="mssnLogo" />
             </div>
             <hr style={{ width: '70%' }} />
-          
+
             <img src={aukLogo} style={{position: 'absolute', top: 200, left: 130, opacity: .2}} alt="auk-logo" width={200} />
             <img src={mssnLogo} style={{position: 'absolute',  bottom: 200, right: 130, opacity: .2}} alt="auk-logo" width={200} />
             <div className="details" style={{ width: '70%' }}>
               <div className="info name">
                 <p className="key">Name:</p>
-                <p className="value">Abubakar Muhammad Umar</p>
+                <p className="value">{studentInfo?.name}</p>
               </div>
               <div className="info regNo">
                 <p className="key">Registration Number:</p>
-                <p className="value">018/019/019/019/019</p>
+                <p className="value">{studentInfo?.registrationNumber}</p>
               </div>
               <div className="info department">
                 <p className="key">Department:</p>
-                <p className="value">Software Engineering</p>
+                <p className="value">{studentInfo?.department}</p>
               </div>
               <div className="info level">
                 <p className="key">Level:</p>
-                <p className="value">400</p>
+                <p className="value">{studentInfo?.level}</p>
               </div>
               <div className="info phone">
                 <p className="key">Phone:</p>
-                <p className="value">0912 123 456</p>
+                <p className="value">{studentInfo?.phone}</p>
               </div>
               <div className="info refNo">
                 <p className="key">Reference Number:</p>
-                <p className="value">018/019/019/019/019</p>
+                <p className="value">{studentInfo?.referenceNumber}</p>
               </div>
               <div className="info date">
                 <p className="key">Date:</p>

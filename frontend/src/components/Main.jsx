@@ -2,6 +2,7 @@ import React from "react";
 import { Grid } from "@mui/material";
 import Navbar from "./navbar/Navbar";
 import Form from "./form/Form";
+// import Reciept from "./reciept/Reciept"; // Import the Reciept component
 
 function Main() {
   return (
@@ -11,9 +12,12 @@ function Main() {
         container
         justifyContent="center"
         alignItems="center"
-        style={{ height: "100%" }}>
-        <Grid  sx={{marginTop: 10}} item>
+        style={{ height: "100%" }}
+      >
+        <Grid item>
+         
           <Form />
+          {/* <Reciept /> */}
         </Grid>
       </Grid>
     </div>

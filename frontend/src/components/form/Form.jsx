@@ -1,5 +1,17 @@
 import React, { useState } from "react";
-import { Box, Button, Grid, Paper, TextField, Typography, Select, MenuItem, InputLabel } from "@mui/material";
+import axios from "axios";
+import {
+  Box,
+  Button,
+  Grid,
+  Paper,
+  TextField,
+  Typography,
+  Select,
+  MenuItem,
+  InputLabel,
+  Autocomplete
+} from "@mui/material";
 
 const Form = () => {
   const [name, setName] = useState("");
@@ -8,36 +20,64 @@ const Form = () => {
   const [level, setLevel] = useState("");
   const [phone, setPhone] = useState("");
   const [error, setError] = useState(false);
-
   const handleSubmit = (e) => {
-    setError(null);
     e.preventDefault();
-    if (name === undefined || name === "" || name === null) {
+  
+    if (!validateForm()) {
+      return;
+    }
+  
+    const formData = {
+      name,
+      regNo,
+      department,
+      level,
+      phone
+    };
+  
+    axios
+      .post("/paystack/pay", formData) // Update the URL with your server's endpoint
+      .then((response) => {
+        // Handle the response from the backend, if necessary
+        const { authorization_url } = response.data;
+        window.location.href = authorization_url;
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  
+  
+
+  const validateForm = () => {
+    setError(null);
+
+    if (!name) {
       setError("Name field is required");
       return false;
     }
-    if (regNo === undefined || regNo === "" || regNo === null) {
+    if (!regNo) {
       setError("Registration number field is required");
       return false;
     }
-    if (department === undefined || department === "" || department === null) {
+    if (!department) {
       setError("Department field is required");
       return false;
     }
-    if (level === undefined || level === "" || level === null) {
+    if (!level) {
       setError("Level field is required");
       return false;
     }
-    if (phone === undefined || phone === "" || phone === null) {
+    if (!phone) {
       setError("Phone field is required");
       return false;
     }
-    console.log(name, regNo, department, level, phone);
+
+    return true;
   };
+
   return (
-    <Paper
-      sx={{ maxWidth: 500, borderRadius: 2, marginTop: 10, marginBottom: 10 }}
-      elevation={5}>
+    <Paper sx={{ maxWidth: 500, borderRadius: 2, marginTop: 30, marginBottom: 10 }} elevation={5}>
       <Grid container gap={2} p={2}>
         <Box
           sx={{
@@ -46,18 +86,20 @@ const Form = () => {
             justifyContent: "center",
             flexDirection: "column",
             width: "100%",
-          }}>
+          }}
+        >
           <Typography variant="h4" sx={{ m: 1, p: 1 }}>
             <b>Student Details</b>
           </Typography>
-          {error && <Typography sx={{ fontSize: 16, color: "red" }}>
-            {error}
-          </Typography>}
+          {error && (
+            <Typography sx={{ fontSize: 16, color: "red" }}>{error}</Typography>
+          )}
         </Box>
         <Grid item xs={12}>
           <TextField
             required
             label="Name"
+            value={name}
             onChange={(e) => setName(e.target.value)}
             sx={{ width: "100%" }}
           />
@@ -66,6 +108,7 @@ const Form = () => {
           <TextField
             required
             label="Registration Number"
+            value={regNo}
             onChange={(e) => setRegNo(e.target.value)}
             sx={{ width: "100%" }}
           />
@@ -74,30 +117,30 @@ const Form = () => {
           <TextField
             required
             label="Department"
+            value={department}
             onChange={(e) => setDepartment(e.target.value)}
             sx={{ width: "100%" }}
           />
         </Grid>
         <Grid item xs={12} sm={12} md={5.78}>
-        <InputLabel id="level-label">Level</InputLabel>
-           <Select
-        labelId="level-label"
-        value={level}
-        onChange={(e) => setLevel(e.target.value)}
-        sx={{ width: "60%"}}
-      
-      >
-        <MenuItem value="100">Level 100</MenuItem>
-        <MenuItem value="200">Level 200</MenuItem>
-        <MenuItem value="300">Level 300</MenuItem>
-        <MenuItem value="400">Level 400</MenuItem>
-      </Select>
-         
+          <InputLabel id="level-label">Level</InputLabel>
+          <Select
+            labelId="level-label"
+            value={level}
+            onChange={(e) => setLevel(e.target.value)}
+            sx={{ width: "60%" }}
+          >
+            <MenuItem value="100">Level 100</MenuItem>
+            <MenuItem value="200">Level 200</MenuItem>
+            <MenuItem value="300">Level 300</MenuItem>
+            <MenuItem value="400">Level 400</MenuItem>
+          </Select>
         </Grid>
         <Grid item xs={12} sm={12} md={5.78}>
           <TextField
             required
             label="Phone number"
+            value={phone}
             onChange={(e) => setPhone(e.target.value)}
             sx={{ width: "100%" }}
           />
@@ -115,7 +158,8 @@ const Form = () => {
               fontWeight: "bold",
               color: "black",
             }}
-            onClick={handleSubmit}>
+            onClick={handleSubmit}
+          >
             Pay
           </Button>
         </Grid>

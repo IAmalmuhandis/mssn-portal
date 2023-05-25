@@ -34,7 +34,6 @@ const VerifyPayment = () => {
               display: 'flex',
               flexDirection: 'column',
               position: 'relative',
-              
             }}
           >
             <div className="header" style={{ paddingTop: 110, width: '100%' }}>
