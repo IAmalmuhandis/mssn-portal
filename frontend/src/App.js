@@ -9,17 +9,13 @@ const App = () => {
     <div className="App">
       <BrowserRouter>
         <Routes>
-          {/*voters dashboard  */}
           <Route path="*" element={<Navigate to="/" replace />} />
           <Route path="/" element={<Main />} />
-          <Route path="/abc" element={<Reciept />} />
+          <Route path="/reciept" element={<Reciept />} />
           <Route path="/payment" element={<VerifyPayment />} />
         </Routes>
-        {/* )
-        } */}
       </BrowserRouter>
     </div>
   );
 };
-
 export default App;

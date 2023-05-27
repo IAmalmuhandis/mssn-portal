@@ -1,84 +1,49 @@
-const express = require('express');
-const request = require('request');
+require('dotenv').config();
+const express = require("express");
 const bodyParser = require('body-parser');
-const path = require('path');
+const cors = require("cors");
+const helmet = require("helmet");
+const monnifService = require('./config/MonifyService');
+const database = require('./models/donor');
+const PaymentService = require('./config/PaymentService');
 
-const { Donor } = require('./models/donor');
-const { initializePayment, verifyPayment } = require('./config/paystack')(request);
-
-const port = process.env.PORT || 8080;
-
+// initialise the express app
 const app = express();
 
+// use helmet
+app.use(helmet());
+
+// use the body parser
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, 'public/')));
 
-app.post('/paystack/pay', (req, res) => {
-  const form = req.body;
+// next enable cors for all requests
+app.use(cors());
 
-  // Additional form validation and processing if needed
+app.get('/api/student', async (request, response) => {
+    const { Donor } = database;
+    response.send(Donor).status(200);
+});
 
-  initializePayment(form, (error, body) => {
-    if (error) {
-      console.log(error);
-      return res.redirect('/error');
+app.post('/api/student/process-payment', async (request, response) => {
+    const { amount, name, regNo, paymentDescription, department, level, phone } = request.body;
+
+    const checkoutUrl = await PaymentService.initialiseTransaction(amount, name, regNo, paymentDescription, department, level, phone);
+
+    if (checkoutUrl === null) {
+        response.send('Error processing payment. Try again').status(400);
     }
 
-    const response = JSON.parse(body);
-    const authorizationUrl = response.data.authorization_url;
-    res.redirect(authorizationUrl);
-  });
+    response.send(checkoutUrl).status(200);
 });
 
+app.post('/api/monnify/webhook', async (request, response) => {
+    response.status(200);
 
-
-app.get('/paystack/callback', (req, res) => {
-  const ref = req.query.reference;
-
-  verifyPayment(ref, (error, body) => {
-    if (error) {
-      console.log(error);
-      return res.redirect('/error');
-    }
-
-    const response = JSON.parse(body);
-    const data = response.data;
-
-    // Extract required data from the response
-
-    const newDonor = {
-      reference: data.reference,
-      amount: data.amount,
-      email: data.customer.email,
-      full_name: data.metadata.full_name,
-      regno: data.metadata.regno,
-      phone: data.metadata.phone,
-      course: data.metadata.course,
-      level: data.metadata.level
-    };
-
-    const donor = new Donor(newDonor);
-
-    donor
-      .save()
-      .then((donor) => {
-        if (!donor) {
-          return res.redirect('/error');
-        }
-
-        res.json({ donor }); // Send a JSON response with the donor data
-      })
-      .catch((e) => {
-        res.redirect('/error');
-      });
-  });
+    const webhookResponse = await monnifService.handleWebhook(request.body);
+    response.send(webhookResponse);
 });
 
-app.get('/error', (req, res) => {
-  res.send('Error occurred');
-});
-
+const port = process.env.PORT || 8080;
 app.listen(port, () => {
-  console.log(`App running on port ${port}`);
+    console.log(`Server running on port ${port}`);
 });

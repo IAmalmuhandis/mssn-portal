@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { useLocation, useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
+
 import axios from 'axios';
 
 import QRCode from 'qrcode'
@@ -14,6 +16,7 @@ import './Reciept.css'
 const Reciept = () => {
   const [qrCode, setQrCode] = useState('')
   const [studentInfo, setStudentInfo] = useState(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
   const contentRef = useRef();
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,6 +40,10 @@ const Reciept = () => {
       console.error(err);
     }
   };
+  useEffect(() => {
+    setCurrentDate(new Date());
+  }, []);
+  
 
   useEffect(() => {
     const registrationNumber = "018/019/019/019/019";
@@ -113,7 +120,7 @@ const Reciept = () => {
               </div>
               <div className="info date">
                 <p className="key">Date:</p>
-                <p className="value">10 Oct 2021</p>
+                <p className="value">{format(currentDate, 'dd MMM yyyy')}</p>
               </div>
             </div>
 

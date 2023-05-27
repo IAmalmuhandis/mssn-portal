@@ -7,10 +7,6 @@ import {
   Paper,
   TextField,
   Typography,
-  Select,
-  MenuItem,
-  InputLabel,
-  Autocomplete
 } from "@mui/material";
 
 const Form = () => {
@@ -20,34 +16,45 @@ const Form = () => {
   const [level, setLevel] = useState("");
   const [phone, setPhone] = useState("");
   const [error, setError] = useState(false);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-  
+
     if (!validateForm()) {
       return;
     }
-  
+
     const formData = {
       name,
       regNo,
       department,
       level,
-      phone
+      phone,
     };
-  
+
+    // Make a POST request to your backend endpoint for Monify integration
     axios
-      .post("/paystack/pay", formData) // Update the URL with your server's endpoint
+      .post("/api/student/process-payment", formData) // Update the URL with your server's endpoint
       .then((response) => {
         // Handle the response from the backend, if necessary
-        const { authorization_url } = response.data;
-        window.location.href = authorization_url;
+        const { payment_url } = response.data;
+        window.open(payment_url, "_blank").focus();
       })
       .catch((error) => {
-        console.error(error);
+        if (error.response) {
+          // The request was made and the server responded with a status code that falls out of the range of 2xx
+          console.error("Response Error:", error.response.data);
+          console.error("Response Status:", error.response.status);
+          console.error("Response Headers:", error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.error("Request Error:", error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.error("Error:", error.message);
+        }
       });
   };
-  
-  
 
   const validateForm = () => {
     setError(null);
@@ -123,18 +130,13 @@ const Form = () => {
           />
         </Grid>
         <Grid item xs={12} sm={12} md={5.78}>
-          <InputLabel id="level-label">Level</InputLabel>
-          <Select
-            labelId="level-label"
+          <TextField
+            required
+            label="Level"
             value={level}
             onChange={(e) => setLevel(e.target.value)}
-            sx={{ width: "60%" }}
-          >
-            <MenuItem value="100">Level 100</MenuItem>
-            <MenuItem value="200">Level 200</MenuItem>
-            <MenuItem value="300">Level 300</MenuItem>
-            <MenuItem value="400">Level 400</MenuItem>
-          </Select>
+            sx={{ width: "100%" }}
+          />
         </Grid>
         <Grid item xs={12} sm={12} md={5.78}>
           <TextField
