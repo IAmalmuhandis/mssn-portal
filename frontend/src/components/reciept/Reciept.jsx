@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Box, Button, Paper, Typography } from "@mui/material";
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
-
 import axios from 'axios';
 
 import QRCode from 'qrcode'
@@ -10,7 +9,6 @@ import html2pdf from "html2pdf.js";
 import { useReactToPrint } from 'react-to-print';
 import aukLogo from "./../../assets/auk-logo.png";
 import mssnLogo from "./../../assets/mssn-auk.png";
-
 import './Reciept.css'
 
 const Reciept = () => {
@@ -20,11 +18,14 @@ const Reciept = () => {
   const contentRef = useRef();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const reference = searchParams.get('reference')
 
-  const generateQR = async (registrationNumber) => {
+  // console.log(searchParams.get('reference'))
+  const generateQR = async (reference) => {
     try {
-      const redirectLink = `/payment?regNo=${registrationNumber}`;
-      const text = `Registration Number: ${registrationNumber}\nRedirect Link: ${redirectLink}`;
+      const redirectLink = `http://localhost:3000/payment/${reference}`;
+      const text = `Reference: ${reference}\nRedirect Link: ${redirectLink}`;
       const qr = await QRCode.toDataURL(text);
       setQrCode(qr);
     } catch (err) {
@@ -32,24 +33,31 @@ const Reciept = () => {
     }
   };
 
-  const fetchStudentInfo = async (registrationNumber) => {
+  const fetchStudentInfo = async (reference) => {
     try {
-      const response = await axios.get(`/api/students/${registrationNumber}`);
+      const response = await axios.get(`http://localhost:8081/api/payment/${reference}`);
       setStudentInfo(response.data);
     } catch (err) {
-      console.error(err);
+      console.error("this " + err);
     }
   };
+  
+  
+  useEffect(() => {
+    fetchStudentInfo(reference)
+  }, []);
+
   useEffect(() => {
     setCurrentDate(new Date());
   }, []);
   
-
   useEffect(() => {
-    const registrationNumber = "018/019/019/019/019";
-    generateQR(registrationNumber);
-    fetchStudentInfo(registrationNumber);
-  }, []);
+
+    
+    generateQR(reference);
+    
+    fetchStudentInfo(reference);
+  }, [location.search]);
 
   const downloadPdf = () => {
     const content = contentRef.current;
@@ -70,11 +78,8 @@ const Reciept = () => {
   });
 
   const redirectToPaymentPage = () => {
-    const registrationNumber = "018/019/019/019/019";
-    const paymentMessage = "Payment Successful";
-    const promptMessage = `Registration Number: ${registrationNumber}\n${paymentMessage}`;
-    alert(promptMessage);
-    navigate(`/payment?regNo=${registrationNumber}&message=${paymentMessage}`);
+    alert("Verify Payment by scanning your QR Code");
+    navigate(`/payment/${searchParams.get('reference')}`);
   }
 
   return (
@@ -96,15 +101,15 @@ const Reciept = () => {
             <div className="details" style={{ width: '70%' }}>
               <div className="info name">
                 <p className="key">Name:</p>
-                <p className="value">{studentInfo?.name}</p>
+                <p className="value">{studentInfo?.full_name}</p>
               </div>
               <div className="info regNo">
                 <p className="key">Registration Number:</p>
-                <p className="value">{studentInfo?.registrationNumber}</p>
+                <p className="value">{studentInfo?.regno}</p>
               </div>
               <div className="info department">
                 <p className="key">Department:</p>
-                <p className="value">{studentInfo?.department}</p>
+                <p className="value">{studentInfo?.course}</p>
               </div>
               <div className="info level">
                 <p className="key">Level:</p>
@@ -116,7 +121,7 @@ const Reciept = () => {
               </div>
               <div className="info refNo">
                 <p className="key">Reference Number:</p>
-                <p className="value">{studentInfo?.referenceNumber}</p>
+                <p className="value">{studentInfo?.reference}</p>
               </div>
               <div className="info date">
                 <p className="key">Date:</p>

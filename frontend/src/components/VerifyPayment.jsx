@@ -3,13 +3,32 @@ import { Box, Paper, Typography } from "@mui/material";
 import Navbar from "./navbar/Navbar";
 import mssnLogo from "./../assets/paid.png";
 import { useLocation } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import axios from 'axios';
 
 import './verifyPayment.css';
 
 const VerifyPayment = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const regNo = params.get("regNo");
+  const ref = params.get("reference");
+  const [reference, setReference] = useState("");
+  const [studentInfo, setStudentInfo] = useState("");
+
+
+  const fetchStudentInfo = async (reference) => {
+    try {
+      const response = await axios.get(`http://localhost:8081/api/payment/${reference}`);
+      setStudentInfo(response.data);
+    } catch (err) {
+      console.error("this " + err);
+    }
+  };
+  console.log(studentInfo);
+  
+  useEffect(() => {
+    fetchStudentInfo(reference)
+  }, []);
 
   return (
     <div className="payment-page">
@@ -59,7 +78,7 @@ const VerifyPayment = () => {
                 Payment Successful!
               </Typography>
               <Typography variant="body1" align="center">
-                Student with registration number {regNo} has made the payment.
+                Student with Registration number {studentInfo?.regno} has made the payment. 
               </Typography>
             </div>
           </Box>

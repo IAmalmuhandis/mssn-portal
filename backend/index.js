@@ -1,49 +1,51 @@
-require('dotenv').config();
-const express = require("express");
-const bodyParser = require('body-parser');
-const cors = require("cors");
-const helmet = require("helmet");
-const monnifService = require('./config/MonifyService');
-const database = require('./models/donor');
-const PaymentService = require('./config/PaymentService');
+const express = require('express')
+const cors = require('cors')
+const mongoose = require('mongoose')
+const { dbUrl } = require('./utils/constants')
+const StudentModel = require('./models/student')
 
-// initialise the express app
-const app = express();
+const app = express()
 
-// use helmet
-app.use(helmet());
+app.use(cors())
+app.use(express.json())
 
-// use the body parser
-app.use(bodyParser.json());
+// endpoints start
 
-// next enable cors for all requests
-app.use(cors());
+app.get('/api/students', async (req, res) => {
+    res.json({ students: await StudentModel.find() })
+})
 
-app.get('/api/student', async (request, response) => {
-    const { Donor } = database;
-    response.send(Donor).status(200);
-});
+app.get('/api/payment/:reference', async (req, res) => {
+    const reference = req.params.reference
+    res.json(await StudentModel.findOne({ reference: reference }))
+})
 
-app.post('/api/student/process-payment', async (request, response) => {
-    const { amount, name, regNo, paymentDescription, department, level, phone } = request.body;
+app.post('/api/students', async (req, res) => {
+    const student = new StudentModel(req.body)
+    res.status(201).json({ student: await student.save() })
+})
 
-    const checkoutUrl = await PaymentService.initialiseTransaction(amount, name, regNo, paymentDescription, department, level, phone);
+app.patch('/api/students/:reference', async (req, res) => {
 
-    if (checkoutUrl === null) {
-        response.send('Error processing payment. Try again').status(400);
+    try {
+      const reference = req.params.reference;
+      const status = req.body.status;
+      const updatedStudent = await StudentModel.findOneAndUpdate(
+        { reference: reference },
+        { status: status },
+        { new: true }
+      );
+  
+      res.json({ student: updatedStudent });
+    } catch (error) {
+      res.status(500).json({ error: 'An error occurred while updating the student.' });
     }
+  });
+  
+// endpoints end
 
-    response.send(checkoutUrl).status(200);
-});
-
-app.post('/api/monnify/webhook', async (request, response) => {
-    response.status(200);
-
-    const webhookResponse = await monnifService.handleWebhook(request.body);
-    response.send(webhookResponse);
-});
-
-const port = process.env.PORT || 8080;
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-});
+const port = 8081
+mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => { console.log('connected') })
+    .catch((error) => { console.log('error >> ', error) })
+app.listen(port, () => { console.log('Server running') })

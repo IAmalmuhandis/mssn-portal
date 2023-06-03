@@ -9,10 +9,10 @@ const App = () => {
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route path="*" element={<Navigate to="/" replace />} />
+        
           <Route path="/" element={<Main />} />
           <Route path="/reciept" element={<Reciept />} />
-          <Route path="/payment" element={<VerifyPayment />} />
+          <Route path="/payment/:reference" element={<VerifyPayment />} />
         </Routes>
       </BrowserRouter>
     </div>
